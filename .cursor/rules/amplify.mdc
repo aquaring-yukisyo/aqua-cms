@@ -1,0 +1,507 @@
+---
+alwaysApply: true
+---
+
+# Amplify Gen2 Development Rules
+
+- profile-nameがse
+
+## プロジェクト概要
+- AWS Amplify Gen2を使用したNext.jsアプリケーション
+- TypeScriptとTailwind CSSを使用
+- 認証、データ、AI機能を含む
+
+## 技術スタック
+- **フロントエンド**: Next.js 15, React 19, TypeScript
+- **スタイリング**: Tailwind CSS
+- **バックエンド**: AWS Amplify Gen2
+- **認証**: Amplify Auth
+- **データベース**: AWS AppSync (GraphQL)
+- **AI**: Amplify AI (Claude, Stable Diffusion)
+
+## Amplify Gen2 ベストプラクティス
+
+### バックエンド設定
+- `amplify/backend.ts`でリソースを定義
+- `defineBackend()`を使用してリソースを設定
+- 型安全性を重視し、TypeScriptを活用
+
+### 認証
+```typescript
+// amplify/auth/resource.ts
+import { defineAuth } from '@aws-amplify/backend';
+
+export const auth = defineAuth({
+  loginWith: {
+    email: true,
+    phone: false,
+  },
+  userAttributes: {
+    email: {
+      required: true,
+      mutable: true,
+    },
+  },
+});
+```
+
+### データ（GraphQL）
+```typescript
+// amplify/data/resource.ts
+import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+
+const schema = a.schema({
+  Todo: a
+    .model({
+      content: a.string(),
+      done: a.boolean(),
+    })
+    .authorization((allow) => [allow.owner()]),
+});
+
+export type Schema = ClientSchema<typeof schema>;
+export const data = defineData({
+  schema,
+  authorizationModes: {
+    defaultAuthorizationMode: 'userPool',
+  },
+});
+```
+
+### フロントエンド統合
+```typescript
+// src/app/layout.tsx
+import { Amplify } from 'aws-amplify';
+import outputs from '../../amplify_outputs.json';
+
+Amplify.configure(outputs);
+```
+
+### クライアントサイドでのデータ操作
+```typescript
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
+
+const client = generateClient<Schema>();
+
+// データの作成
+const { data: newTodo } = await client.models.Todo.create({
+  content: 'New todo',
+  done: false,
+});
+
+// データの取得
+const { data: todos } = await client.models.Todo.list();
+```
+
+## AI機能の実装
+
+### AI設定
+```typescript
+// amplify/backend.ts
+import { defineBackend } from '@aws-amplify/backend';
+import { auth } from './auth/resource';
+import { data } from './data/resource';
+
+const backend = defineBackend({
+  auth,
+  data,
+});
+
+// AI機能の追加
+backend.addOutput({
+  custom: {
+    AI: {
+      generateText: {
+        model: 'anthropic.claude-3-haiku-20240307-v1:0',
+        region: 'us-east-1'
+      },
+      generateImage: {
+        model: 'stability.stable-diffusion-xl-v1',
+        region: 'us-east-1'
+      }
+    }
+  }
+});
+```
+
+### AI機能の使用
+```typescript
+import { generateClient } from 'aws-amplify/api';
+
+const client = generateClient();
+
+// テキスト生成
+const generateText = async (prompt: string) => {
+  try {
+    const result = await client.generations.createTextGeneration({
+      aiModel: 'anthropic.claude-3-haiku-20240307-v1:0',
+      systemPrompt: 'You are a helpful assistant.',
+      textGenerationConfig: {
+        maxTokens: 1000,
+        temperature: 0.7,
+      },
+      messages: [
+        {
+          role: 'user',
+          content: [{ text: prompt }],
+        },
+      ],
+    });
+    return result.content[0].text;
+  } catch (error) {
+    console.error('Text generation failed:', error);
+    throw error;
+  }
+};
+
+// 画像生成
+const generateImage = async (prompt: string) => {
+  try {
+    const result = await client.generations.createImageGeneration({
+      aiModel: 'stability.stable-diffusion-xl-v1',
+      imageGenerationConfig: {
+        numberOfImages: 1,
+        height: 512,
+        width: 512,
+        cfgScale: 7,
+        seed: Math.floor(Math.random() * 1000000),
+      },
+      messages: [
+        {
+          role: 'user',
+          content: [{ text: prompt }],
+        },
+      ],
+    });
+    return result.images[0];
+  } catch (error) {
+    console.error('Image generation failed:', error);
+    throw error;
+  }
+};
+```
+
+## 開発フロー
+
+### 1. サンドボックス環境
+```bash
+# サンドボックス開始
+npx ampx sandbox --profile [profile-name]
+
+# 一度だけ実行
+npx ampx sandbox --once --profile [profile-name]
+
+# サンドボックス削除
+npx ampx sandbox delete --profile [profile-name]
+```
+
+### 2. デプロイ
+```bash
+# 本番環境へのデプロイ
+npx ampx pipeline-deploy --branch main --profile [profile-name]
+```
+
+### 3. 型生成
+```bash
+# GraphQLの型を生成
+npx ampx generate graphql-client-code --profile [profile-name]
+```
+
+## コーディング規約
+
+### TypeScript
+- 厳密な型定義を使用
+- `any`型の使用を避ける
+- インターフェースと型エイリアスを適切に使い分ける
+
+### React/Next.js
+- 関数コンポーネントを使用
+- `use client`ディレクティブを適切に使用
+- カスタムフックでロジックを分離
+
+### Amplify Gen2
+- リソース定義は`amplify/`ディレクトリに配置
+- 型安全なクライアントを使用
+- エラーハンドリングを適切に実装
+
+## ファイル構成
+```
+project/
+├── amplify/
+│   ├── auth/
+│   │   └── resource.ts
+│   ├── data/
+│   │   └── resource.ts
+│   └── backend.ts
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+├── amplify_outputs.json
+└── package.json
+```
+
+## 注意事項
+- `amplify_outputs.json`は自動生成されるため、手動編集しない
+- 認証が必要な機能は適切にガードする
+- AI機能は使用量に注意してコストを管理する
+- サンドボックス環境は開発用のみ使用し、本番データは扱わない
+
+## デバッグ
+- Amplify Studioでデータを確認
+- CloudWatch Logsでエラーを確認
+- ブラウザの開発者ツールでネットワークリクエストを確認# Amplify Gen2 Development Rules
+
+## プロジェクト概要
+- AWS Amplify Gen2を使用したNext.jsアプリケーション
+- TypeScriptとTailwind CSSを使用
+- 認証、データ、AI機能を含む
+
+## 技術スタック
+- **フロントエンド**: Next.js 15, React 19, TypeScript
+- **スタイリング**: Tailwind CSS
+- **バックエンド**: AWS Amplify Gen2
+- **認証**: Amplify Auth
+- **データベース**: AWS AppSync (GraphQL)
+- **AI**: Amplify AI (Claude, Stable Diffusion)
+
+## Amplify Gen2 ベストプラクティス
+
+### バックエンド設定
+- `amplify/backend.ts`でリソースを定義
+- `defineBackend()`を使用してリソースを設定
+- 型安全性を重視し、TypeScriptを活用
+
+### 認証
+```typescript
+// amplify/auth/resource.ts
+import { defineAuth } from '@aws-amplify/backend';
+
+export const auth = defineAuth({
+  loginWith: {
+    email: true,
+    phone: false,
+  },
+  userAttributes: {
+    email: {
+      required: true,
+      mutable: true,
+    },
+  },
+});
+```
+
+### データ（GraphQL）
+```typescript
+// amplify/data/resource.ts
+import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+
+const schema = a.schema({
+  Todo: a
+    .model({
+      content: a.string(),
+      done: a.boolean(),
+    })
+    .authorization((allow) => [allow.owner()]),
+});
+
+export type Schema = ClientSchema<typeof schema>;
+export const data = defineData({
+  schema,
+  authorizationModes: {
+    defaultAuthorizationMode: 'userPool',
+  },
+});
+```
+
+### フロントエンド統合
+```typescript
+// src/app/layout.tsx
+import { Amplify } from 'aws-amplify';
+import outputs from '../../amplify_outputs.json';
+
+Amplify.configure(outputs);
+```
+
+### クライアントサイドでのデータ操作
+```typescript
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
+
+const client = generateClient<Schema>();
+
+// データの作成
+const { data: newTodo } = await client.models.Todo.create({
+  content: 'New todo',
+  done: false,
+});
+
+// データの取得
+const { data: todos } = await client.models.Todo.list();
+```
+
+## AI機能の実装
+
+### AI設定
+```typescript
+// amplify/backend.ts
+import { defineBackend } from '@aws-amplify/backend';
+import { auth } from './auth/resource';
+import { data } from './data/resource';
+
+const backend = defineBackend({
+  auth,
+  data,
+});
+
+// AI機能の追加
+backend.addOutput({
+  custom: {
+    AI: {
+      generateText: {
+        model: 'anthropic.claude-3-haiku-20240307-v1:0',
+        region: 'us-east-1'
+      },
+      generateImage: {
+        model: 'stability.stable-diffusion-xl-v1',
+        region: 'us-east-1'
+      }
+    }
+  }
+});
+```
+
+### AI機能の使用
+```typescript
+import { generateClient } from 'aws-amplify/api';
+
+const client = generateClient();
+
+// テキスト生成
+const generateText = async (prompt: string) => {
+  try {
+    const result = await client.generations.createTextGeneration({
+      aiModel: 'anthropic.claude-3-haiku-20240307-v1:0',
+      systemPrompt: 'You are a helpful assistant.',
+      textGenerationConfig: {
+        maxTokens: 1000,
+        temperature: 0.7,
+      },
+      messages: [
+        {
+          role: 'user',
+          content: [{ text: prompt }],
+        },
+      ],
+    });
+    return result.content[0].text;
+  } catch (error) {
+    console.error('Text generation failed:', error);
+    throw error;
+  }
+};
+
+// 画像生成
+const generateImage = async (prompt: string) => {
+  try {
+    const result = await client.generations.createImageGeneration({
+      aiModel: 'stability.stable-diffusion-xl-v1',
+      imageGenerationConfig: {
+        numberOfImages: 1,
+        height: 512,
+        width: 512,
+        cfgScale: 7,
+        seed: Math.floor(Math.random() * 1000000),
+      },
+      messages: [
+        {
+          role: 'user',
+          content: [{ text: prompt }],
+        },
+      ],
+    });
+    return result.images[0];
+  } catch (error) {
+    console.error('Image generation failed:', error);
+    throw error;
+  }
+};
+```
+
+## 開発フロー
+
+### 1. サンドボックス環境
+```bash
+# サンドボックス開始
+npx ampx sandbox --profile [profile-name]
+
+# 一度だけ実行
+npx ampx sandbox --once --profile [profile-name]
+
+# サンドボックス削除
+npx ampx sandbox delete --profile [profile-name]
+```
+
+### 2. デプロイ
+```bash
+# 本番環境へのデプロイ
+npx ampx pipeline-deploy --branch main --profile [profile-name]
+```
+
+### 3. 型生成
+```bash
+# GraphQLの型を生成
+npx ampx generate graphql-client-code --profile [profile-name]
+```
+
+## コーディング規約
+
+### TypeScript
+- 厳密な型定義を使用
+- `any`型の使用を避ける
+- インターフェースと型エイリアスを適切に使い分ける
+
+### React/Next.js
+- 関数コンポーネントを使用
+- `use client`ディレクティブを適切に使用
+- カスタムフックでロジックを分離
+
+### Amplify Gen2
+- リソース定義は`amplify/`ディレクトリに配置
+- 型安全なクライアントを使用
+- エラーハンドリングを適切に実装
+
+## ファイル構成
+```
+project/
+├── amplify/
+│   ├── auth/
+│   │   └── resource.ts
+│   ├── data/
+│   │   └── resource.ts
+│   └── backend.ts
+├── app/
+│   ├── pages/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+├── amplify_outputs.json
+└── package.json
+```
+
+## 注意事項
+- `amplify_outputs.json`は自動生成されるため、手動編集しない
+- 認証が必要な機能は適切にガードする
+- AI機能は使用量に注意してコストを管理する
+- サンドボックス環境は開発用のみ使用し、本番データは扱わない
+
+## デバッグ
+- Amplify Studioでデータを確認
+- CloudWatch Logsでエラーを確認
+- ブラウザの開発者ツールでネットワークリクエストを確認
