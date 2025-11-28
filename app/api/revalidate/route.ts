@@ -1,42 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 /**
  * サイト再構築API
- * 公開ページのキャッシュをクリアして再生成をトリガー
+ * タグベースのオンデマンド再検証で静的ページを更新
  */
 export async function POST(request: NextRequest) {
   try {
     console.log("🔄 サイト再構築を開始...");
     
-    // トップページ（お知らせ一覧）のキャッシュをクリア
-    revalidatePath("/");
-    console.log("✅ トップページのキャッシュをクリア");
+    // お知らせのタグを再検証
+    revalidateTag('news-list');
+    revalidateTag('news-detail');
+    console.log("✅ お知らせのキャッシュをクリア");
     
-    // お知らせのキャッシュをクリア
-    revalidatePath("/news/[id]", "page");
-    console.log("✅ お知らせ詳細のキャッシュをクリア");
-    
-    // 実績のキャッシュをクリア
-    revalidatePath("/achievements", "page");
-    revalidatePath("/achievements/[id]", "page");
+    // 実績のタグを再検証
+    revalidateTag('achievements-list');
+    revalidateTag('achievements-detail');
     console.log("✅ 実績のキャッシュをクリア");
-    
-    // 会社情報のキャッシュをクリア
-    revalidatePath("/company", "page");
-    console.log("✅ 会社情報のキャッシュをクリア");
 
     return NextResponse.json({
       success: true,
       message: "サイトの再構築を完了しました",
       revalidated: true,
       now: Date.now(),
-      revalidatedPaths: [
-        "/",
-        "/news/[id]",
-        "/achievements",
-        "/achievements/[id]",
-        "/company"
+      revalidatedTags: [
+        'news-list',
+        'news-detail',
+        'achievements-list',
+        'achievements-detail',
       ],
     });
   } catch (error) {
@@ -50,5 +42,12 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// GETリクエストも対応（テスト用）
+export async function GET(request: NextRequest) {
+  return NextResponse.json({
+    message: "再構築APIです。POSTメソッドでリクエストしてください。",
+  });
 }
 

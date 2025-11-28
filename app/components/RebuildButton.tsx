@@ -37,12 +37,7 @@ export const RebuildButton = ({ onRebuildComplete }: RebuildButtonProps) => {
       const result = await response.json();
       console.log("✅ 再構築成功:", result);
 
-      alert("サイトの再構築を完了しました！\n\n公開ページが更新されました。ページをリロードして確認してください。");
-      
-      // ページをリロードして最新のデータを表示
-      if (typeof window !== 'undefined') {
-        window.location.reload();
-      }
+      alert("サイトの再構築を完了しました！\n\nページをリロードして、公開ページで更新を確認してください。");
       
       onRebuildComplete?.();
     } catch (err) {

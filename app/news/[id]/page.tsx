@@ -20,9 +20,9 @@ type News = {
   updatedAt: string;
 };
 
-// 動的生成 - 再構築ボタンで更新可能
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// 静的生成 + オンデマンド再検証（再構築ボタンでのみ更新）
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -64,7 +64,9 @@ async function fetchNews(newsId: string): Promise<News | null> {
         query,
         variables: { id: newsId },
       }),
-      cache: 'no-store', // キャッシュを無効化
+      next: { 
+        tags: ['news-detail', `news-${newsId}`],
+      },
     });
 
     const result = await response.json();

@@ -10,7 +10,8 @@ const nextConfig = {
   },
   // Amplify Gen2サポート
   transpilePackages: ['@aws-amplify/ui-react'],
-  // 静的エクスポートの準備（将来的に有効化可能）
+  
+  // 静的エクスポートは無効（ISRを使用するため）
   // output: 'export',
   
   // HTTP 431エラー対策 - ヘッダーサイズ制限を増やす
@@ -20,7 +21,7 @@ const nextConfig = {
     },
   },
   
-  // カスタムサーバー設定（開発環境用）
+  // カスタムヘッダー設定
   async headers() {
     return [
       {
