@@ -21,8 +21,9 @@ type Achievement = {
   updatedAt: string;
 };
 
-// ISR: 手動再検証のみ（再構築ボタンでのみ更新）
-export const revalidate = false;
+// 動的レンダリング - 常に最新のデータを表示
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function fetchAchievements(): Promise<Achievement[]> {
   try {
@@ -62,9 +63,7 @@ async function fetchAchievements(): Promise<Achievement[]> {
         "x-api-key": apiKey,
       },
       body: JSON.stringify({ query }),
-      next: { 
-        tags: ['achievements-list'],
-      },
+      cache: 'no-store', // キャッシュなし - 常に最新データを取得
     });
 
     const result = await response.json();

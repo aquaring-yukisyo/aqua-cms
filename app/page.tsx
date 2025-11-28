@@ -18,9 +18,9 @@ type News = {
   updatedAt: string;
 };
 
-// ISR: 手動再検証のみ（再構築ボタンでのみ更新）
-// dynamicは指定しない（デフォルトの'auto'を使用）
-export const revalidate = false; // 自動再検証は無効、タグベースで手動再検証のみ
+// 動的レンダリング - 常に最新のデータを表示
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function fetchNews(): Promise<News[]> {
   try {
@@ -57,9 +57,7 @@ async function fetchNews(): Promise<News[]> {
         "x-api-key": apiKey,
       },
       body: JSON.stringify({ query }),
-      next: { 
-        tags: ['news-list'], // タグベースの再検証
-      },
+      cache: 'no-store', // キャッシュなし - 常に最新データを取得
     });
 
     const result = await response.json();

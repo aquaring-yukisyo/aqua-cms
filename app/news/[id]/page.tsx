@@ -20,8 +20,9 @@ type News = {
   updatedAt: string;
 };
 
-// ISR: 手動再検証のみ（再構築ボタンでのみ更新）
-export const revalidate = false;
+// 動的レンダリング - 常に最新のデータを表示
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -63,9 +64,7 @@ async function fetchNews(newsId: string): Promise<News | null> {
         query,
         variables: { id: newsId },
       }),
-      next: { 
-        tags: ['news-detail', `news-${newsId}`],
-      },
+      cache: 'no-store', // キャッシュなし - 常に最新データを取得
     });
 
     const result = await response.json();
