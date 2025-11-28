@@ -99,8 +99,8 @@ export const RebuildButton = ({ onRebuildComplete }: RebuildButtonProps) => {
       <div className="text-sm text-gray-600">
         <p className="mb-2">💡 再構築について：</p>
         <ul className="list-disc list-inside space-y-1 text-xs">
-          <li>公開中のお知らせから静的ページを生成します</li>
-          <li>お知らせを追加・編集・削除した後に実行してください</li>
+          <li>公開中のお知らせ・実績から静的ページを生成します</li>
+          <li>コンテンツを追加・編集・削除した後に実行してください</li>
           <li>再構築には数分かかる場合があります</li>
         </ul>
       </div>

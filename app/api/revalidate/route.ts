@@ -9,18 +9,21 @@ export async function POST(request: NextRequest) {
   try {
     console.log("🔄 サイト再構築を開始...");
     
-    // トップページを再検証（タグベース）
+    // お知らせのキャッシュをクリア
     revalidateTag("news-list");
-    console.log("✅ トップページのキャッシュをクリア");
-    
-    // すべてのニュース詳細ページを再検証（パスベース）
     revalidatePath("/", "layout");
     revalidatePath("/news/[id]", "page");
-    console.log("✅ お知らせ詳細ページのキャッシュをクリア");
+    console.log("✅ お知らせのキャッシュをクリア");
+    
+    // 実績のキャッシュをクリア
+    revalidateTag("achievements-list");
+    revalidatePath("/achievements", "page");
+    revalidatePath("/achievements/[id]", "page");
+    console.log("✅ 実績のキャッシュをクリア");
 
     return NextResponse.json({
       success: true,
-      message: "サイトの再構築を開始しました",
+      message: "サイトの再構築を開始しました（お知らせ・実績）",
       revalidated: true,
       now: Date.now(),
     });

@@ -18,6 +18,12 @@ export const Header = () => {
               お知らせ
             </Link>
             <Link
+              href="/achievements"
+              className="text-gray-600 hover:text-secondary-600 transition-colors"
+            >
+              実績
+            </Link>
+            <Link
               href="/company"
               className="text-gray-600 hover:text-primary-600 transition-colors"
             >

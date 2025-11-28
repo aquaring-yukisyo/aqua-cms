@@ -42,7 +42,13 @@ export const AdminHeader = () => {
                 href="/admin/news/new"
                 className="text-gray-600 hover:text-primary-600 transition-colors"
               >
-                新規作成
+                お知らせ作成
+              </Link>
+              <Link
+                href="/admin/achievements"
+                className="text-gray-600 hover:text-secondary-600 transition-colors"
+              >
+                実績管理
               </Link>
             </nav>
           </div>
