@@ -21,8 +21,7 @@ type Achievement = {
   updatedAt: string;
 };
 
-// 静的生成 + オンデマンド再検証（再構築ボタンでのみ更新）
-export const dynamic = 'force-static';
+// ISR: 手動再検証のみ（再構築ボタンでのみ更新）
 export const revalidate = false;
 
 async function fetchAchievements(): Promise<Achievement[]> {

@@ -18,9 +18,9 @@ type News = {
   updatedAt: string;
 };
 
-// 静的生成 + オンデマンド再検証（再構築ボタンでのみ更新）
-export const dynamic = 'force-static';
-export const revalidate = false; // 自動再検証は無効、タグベースで手動再検証
+// ISR: 手動再検証のみ（再構築ボタンでのみ更新）
+// dynamicは指定しない（デフォルトの'auto'を使用）
+export const revalidate = false; // 自動再検証は無効、タグベースで手動再検証のみ
 
 async function fetchNews(): Promise<News[]> {
   try {
