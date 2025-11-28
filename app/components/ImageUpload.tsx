@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { uploadData, remove } from "aws-amplify/storage";
-import { validateImageFile, formatFileSize } from "@/app/lib/utils";
+import { uploadData, remove, getUrl } from "aws-amplify/storage";
+import { validateImageFile } from "@/app/lib/utils";
 
 type ImageUploadProps = {
   currentImageUrl?: string;
@@ -49,7 +49,7 @@ export const ImageUpload = ({
       // S3にアップロード
       const timestamp = Date.now();
       const filename = `${timestamp}-${file.name}`;
-      const key = `news-images/${filename}`;
+      const key = `public/news-images/${filename}`; // publicプレフィックスを追加
 
       const result = await uploadData({
         key,
@@ -59,10 +59,17 @@ export const ImageUpload = ({
         },
       }).result;
 
-      // 公開URLを生成
-      const url = `https://${process.env.NEXT_PUBLIC_AMPLIFY_STORAGE_BUCKET}.s3.${process.env.NEXT_PUBLIC_AMPLIFY_REGION}.amazonaws.com/public/${key}`;
+      console.log("Upload result:", result);
 
-      onImageUploaded(url, key);
+      // AmplifyのgetUrlを使用して正しいURLを取得
+      const urlResult = await getUrl({
+        key,
+      });
+
+      const publicUrl = urlResult.url.toString().split('?')[0]; // クエリパラメータを除去
+      console.log("Public URL:", publicUrl);
+
+      onImageUploaded(publicUrl, key);
     } catch (err) {
       console.error("Upload error:", err);
       setError("画像のアップロードに失敗しました");
@@ -80,7 +87,9 @@ export const ImageUpload = ({
     try {
       // S3から削除
       if (currentImageKey) {
-        await remove({ key: currentImageKey });
+        await remove({ 
+          key: currentImageKey,
+        });
       }
 
       setPreviewUrl(null);
