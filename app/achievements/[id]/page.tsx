@@ -22,9 +22,9 @@ type Achievement = {
   updatedAt: string;
 };
 
-// 完全な静的生成
-export const dynamic = 'force-static';
-export const revalidate = false;
+// 動的生成 - 再構築ボタンで更新可能
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -69,10 +69,7 @@ async function fetchAchievement(achievementId: string): Promise<Achievement | nu
         query,
         variables: { id: achievementId },
       }),
-      next: { 
-        revalidate: false,
-        tags: [`achievement-${achievementId}`]
-      },
+      cache: 'no-store', // キャッシュを無効化
     });
 
     const result = await response.json();

@@ -21,9 +21,9 @@ type Achievement = {
   updatedAt: string;
 };
 
-// 完全な静的生成
-export const dynamic = 'force-static';
-export const revalidate = false;
+// 動的生成 - 再構築ボタンで更新可能
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function fetchAchievements(): Promise<Achievement[]> {
   try {
@@ -63,10 +63,7 @@ async function fetchAchievements(): Promise<Achievement[]> {
         "x-api-key": apiKey,
       },
       body: JSON.stringify({ query }),
-      next: { 
-        revalidate: false,
-        tags: ['achievements-list']
-      },
+      cache: 'no-store', // キャッシュを無効化
     });
 
     const result = await response.json();

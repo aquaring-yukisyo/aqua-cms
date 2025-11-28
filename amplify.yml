@@ -22,3 +22,7 @@ frontend:
       - .next/cache/**/*
       - .npm/**/*
       - node_modules/**/*
+  environment:
+    variables:
+      # Next.js用の環境変数
+      NEXT_PUBLIC_ENV: production

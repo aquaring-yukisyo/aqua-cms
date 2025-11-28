@@ -18,9 +18,9 @@ type News = {
   updatedAt: string;
 };
 
-// 完全な静的生成 - 再構築ボタンでのみ更新
-export const dynamic = 'force-static';
-export const revalidate = false;
+// Incremental Static Regeneration (ISR) - 再構築ボタンで更新可能
+export const dynamic = 'force-dynamic'; // または 'auto' - 本番環境で動的に更新可能にする
+export const revalidate = 0; // オンデマンド再検証を有効化
 
 async function fetchNews(): Promise<News[]> {
   try {
@@ -57,10 +57,7 @@ async function fetchNews(): Promise<News[]> {
         "x-api-key": apiKey,
       },
       body: JSON.stringify({ query }),
-      next: { 
-        revalidate: false, // 完全にキャッシュ
-        tags: ['news-list'] // タグベースで再検証
-      },
+      cache: 'no-store', // キャッシュを無効化して常に最新データを取得
     });
 
     const result = await response.json();

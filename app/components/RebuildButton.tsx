@@ -19,18 +19,34 @@ export const RebuildButton = ({ onRebuildComplete }: RebuildButtonProps) => {
     setError(null);
 
     try {
-      // TODO: Lambda関数を呼び出す
-      // 現在は簡易実装として、Next.jsのrevalidateを使用
-      
       // 公開ページのキャッシュをクリア
-      await fetch("/api/revalidate", {
+      const response = await fetch("/api/revalidate", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      alert("サイトの再構築を開始しました！\n\n数分後に公開ページが更新されます。");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `再構築に失敗しました (Status: ${response.status})`
+        );
+      }
+
+      const result = await response.json();
+      console.log("✅ 再構築成功:", result);
+
+      alert("サイトの再構築を完了しました！\n\n公開ページが更新されました。ページをリロードして確認してください。");
+      
+      // ページをリロードして最新のデータを表示
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+      
       onRebuildComplete?.();
     } catch (err) {
-      console.error("Rebuild error:", err);
+      console.error("❌ Rebuild error:", err);
       setError(
         err instanceof Error ? err.message : "再構築に失敗しました"
       );
