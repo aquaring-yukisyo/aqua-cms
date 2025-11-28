@@ -24,7 +24,7 @@ export default function AchievementEditPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [client, setClient] = useState("");
+  const [clientName, setClientName] = useState("");
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageKey, setImageKey] = useState("");
@@ -51,7 +51,7 @@ export default function AchievementEditPage() {
       setTitle(data.title);
       setDescription(data.description);
       setCategory(data.category || "");
-      setClient(data.client || "");
+      setClientName(data.client || "");
       setUrl(data.url || "");
       setImageUrl(data.imageUrl || "");
       setImageKey(data.imageKey || "");
@@ -89,7 +89,7 @@ export default function AchievementEditPage() {
         title: title.trim(),
         description: description.trim(),
         category: category.trim() || null,
-        client: client.trim() || null,
+        client: clientName.trim() || null,
         url: url.trim() || null,
       };
 
@@ -131,7 +131,7 @@ export default function AchievementEditPage() {
       title !== achievement?.title ||
       description !== achievement?.description ||
       category !== (achievement?.category || "") ||
-      client !== (achievement?.client || "") ||
+      clientName !== (achievement?.client || "") ||
       url !== (achievement?.url || "") ||
       imageUrl !== (achievement?.imageUrl || "")
     ) {
@@ -207,14 +207,14 @@ export default function AchievementEditPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="client" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-2">
                       クライアント名
                     </label>
                     <input
-                      id="client"
+                      id="clientName"
                       type="text"
-                      value={client}
-                      onChange={(e) => setClient(e.target.value)}
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent outline-none transition-all"
                       disabled={saving}
                     />

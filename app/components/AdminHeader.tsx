@@ -34,21 +34,15 @@ export const AdminHeader = () => {
             <nav className="hidden md:flex items-center space-x-6">
               <Link
                 href="/admin"
-                className="text-gray-600 hover:text-primary-600 transition-colors"
+                className="text-gray-600 hover:text-primary-600 transition-colors font-medium"
               >
                 ダッシュボード
               </Link>
               <Link
-                href="/admin/news/new"
-                className="text-gray-600 hover:text-primary-600 transition-colors"
+                href="/"
+                className="text-gray-600 hover:text-gray-900 transition-colors"
               >
-                お知らせ作成
-              </Link>
-              <Link
-                href="/admin/achievements"
-                className="text-gray-600 hover:text-secondary-600 transition-colors"
-              >
-                実績管理
+                公開ページ
               </Link>
             </nav>
           </div>
@@ -58,12 +52,6 @@ export const AdminHeader = () => {
                 {user.signInDetails?.loginId}
               </span>
             )}
-            <Link
-              href="/"
-              className="px-4 py-2 text-gray-600 hover:text-primary-600 transition-colors"
-            >
-              公開ページ
-            </Link>
             <button
               onClick={handleSignOut}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"

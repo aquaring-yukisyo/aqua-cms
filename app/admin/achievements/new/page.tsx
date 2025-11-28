@@ -15,7 +15,7 @@ export default function AchievementCreatePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [client, setClient] = useState("");
+  const [clientName, setClientName] = useState("");
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageKey, setImageKey] = useState("");
@@ -48,7 +48,7 @@ export default function AchievementCreatePage() {
       };
 
       if (category.trim()) achievementData.category = category.trim();
-      if (client.trim()) achievementData.client = client.trim();
+      if (clientName.trim()) achievementData.client = clientName.trim();
       if (url.trim()) achievementData.url = url.trim();
       if (imageUrl) {
         achievementData.imageUrl = imageUrl;
@@ -82,7 +82,7 @@ export default function AchievementCreatePage() {
   };
 
   const handleCancel = () => {
-    if (title || description || category || client || url || imageUrl) {
+    if (title || description || category || clientName || url || imageUrl) {
       if (!confirm("入力内容が保存されていません。破棄してもよろしいですか？")) {
         return;
       }
@@ -176,16 +176,16 @@ export default function AchievementCreatePage() {
               {/* クライアント */}
               <div>
                 <label
-                  htmlFor="client"
+                  htmlFor="clientName"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   クライアント名
                 </label>
                 <input
-                  id="client"
+                  id="clientName"
                   type="text"
-                  value={client}
-                  onChange={(e) => setClient(e.target.value)}
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent outline-none transition-all"
                   placeholder="クライアント名を入力してください"
                   disabled={saving}
