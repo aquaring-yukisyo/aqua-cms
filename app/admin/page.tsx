@@ -98,7 +98,9 @@ export default function AdminDashboard() {
     }
 
     try {
-      const { errors } = await client.models.News.delete({ id });
+      const { errors } = await client.models.News.delete({ id }, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("削除に失敗しました");
@@ -118,7 +120,9 @@ export default function AdminDashboard() {
     }
 
     try {
-      const { errors } = await client.models.Achievement.delete({ id });
+      const { errors } = await client.models.Achievement.delete({ id }, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("削除に失敗しました");
@@ -145,7 +149,9 @@ export default function AdminDashboard() {
         updateData.publishedAt = new Date().toISOString();
       }
 
-      const { errors } = await client.models.News.update(updateData);
+      const { errors } = await client.models.News.update(updateData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("ステータスの変更に失敗しました");
@@ -174,7 +180,9 @@ export default function AdminDashboard() {
         updateData.publishedAt = new Date().toISOString();
       }
 
-      const { errors } = await client.models.Achievement.update(updateData);
+      const { errors } = await client.models.Achievement.update(updateData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("ステータスの変更に失敗しました");

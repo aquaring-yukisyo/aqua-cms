@@ -59,7 +59,9 @@ export default function AchievementCreatePage() {
         achievementData.publishedAt = new Date().toISOString();
       }
 
-      const { data, errors } = await client.models.Achievement.create(achievementData);
+      const { data, errors } = await client.models.Achievement.create(achievementData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("実績の作成に失敗しました");

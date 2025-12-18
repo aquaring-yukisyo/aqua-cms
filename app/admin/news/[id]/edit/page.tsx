@@ -99,7 +99,9 @@ export default function NewsEditPage() {
         }
       }
 
-      const { data, errors } = await client.models.News.update(updateData);
+      const { data, errors } = await client.models.News.update(updateData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("お知らせの更新に失敗しました");

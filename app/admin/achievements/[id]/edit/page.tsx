@@ -108,7 +108,9 @@ export default function AchievementEditPage() {
         }
       }
 
-      const { data, errors } = await client.models.Achievement.update(updateData);
+      const { data, errors } = await client.models.Achievement.update(updateData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("実績の更新に失敗しました");

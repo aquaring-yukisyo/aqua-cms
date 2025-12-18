@@ -53,7 +53,9 @@ export default function NewsCreatePage() {
         newsData.publishedAt = new Date().toISOString();
       }
 
-      const { data, errors } = await client.models.News.create(newsData);
+      const { data, errors } = await client.models.News.create(newsData, {
+        authMode: 'userPool'
+      });
 
       if (errors) {
         throw new Error("お知らせの作成に失敗しました");
